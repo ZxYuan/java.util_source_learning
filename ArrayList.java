@@ -732,7 +732,7 @@ public class ArrayList<E> extends AbstractList<E>
      * @serialData The length of the array backing the <tt>ArrayList</tt>
      *             instance is emitted (int), followed by all of its elements
      *             (each an <tt>Object</tt>) in the proper order.
-     */
+     */ // private的理由以及serializer怎样调到它（反射） http://stackoverflow.com/questions/7467313
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException{ // 序列化, 不需要显示调用，序列化机制会自动调用
         // Write out element count, and any hidden stuff
