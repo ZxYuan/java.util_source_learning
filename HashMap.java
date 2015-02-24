@@ -333,9 +333,9 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * to incorporate impact of the highest bits that would otherwise
      * never be used in index calculations because of table bounds.
      */
-    static final int hash(Object key) { // 这个hash又是干啥的
+    static final int hash(Object key) { // 计算key的hash，会用在之后的getNode函数
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16); //key自己的hashCode函数
     }
 
     /**
@@ -551,7 +551,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @see #put(Object, Object)
      */
-    public V get(Object key) {
+    public V get(Object key) { //拿到key对应的value
         Node<K,V> e;
         return (e = getNode(hash(key), key)) == null ? null : e.value;
     }
@@ -563,19 +563,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param key the key
      * @return the node, or null if none
      */
-    final Node<K,V> getNode(int hash, Object key) {
+    final Node<K,V> getNode(int hash, Object key) { //根据hash和key找节点，hash究竟咋来 hama
         Node<K,V>[] tab; Node<K,V> first, e; int n; K k;
-        if ((tab = table) != null && (n = tab.length) > 0 &&
-            (first = tab[(n - 1) & hash]) != null) {
-            if (first.hash == hash && // always check first node
-                ((k = first.key) == key || (key != null && key.equals(k))))
+        if ((tab = table) != null && (n = tab.length) > 0 && //table就是存节点的
+            (first = tab[(n - 1) & hash]) != null) { //first=第(n - 1) & hash个表节点
+            if (first.hash == hash && // always check first node //检查表节点第一个键值对的hash 为啥需要?
+                ((k = first.key) == key || (key != null && key.equals(k)))) // key相等
                 return first;
-            if ((e = first.next) != null) {
-                if (first instanceof TreeNode)
+            if ((e = first.next) != null) { //若first的下一个键值对非空
+                if (first instanceof TreeNode) //若是TreeNode
                     return ((TreeNode<K,V>)first).getTreeNode(hash, key);
-                do {
-                    if (e.hash == hash &&
-                        ((k = e.key) == key || (key != null && key.equals(k))))
+                do { //若是普通链表Node，遍历链表
+                    if (e.hash == hash && //hash相等
+                        ((k = e.key) == key || (key != null && key.equals(k)))) //key相等
                         return e;
                 } while ((e = e.next) != null);
             }
@@ -607,8 +607,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *         (A <tt>null</tt> return can also indicate that the map
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public V put(K key, V value) {
-        return putVal(hash(key), key, value, false, true);
+    public V put(K key, V value) { //加个键值对
+        return putVal(hash(key), key, value, false, true); //false==可覆盖已存在的，true==不在创建模式
     }
 
     /**
@@ -617,50 +617,50 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param hash hash for key
      * @param key the key
      * @param value the value to put
-     * @param onlyIfAbsent if true, don't change existing value
+     * @param onlyIfAbsent if true, don't change existing value //这里null不算哦,(key,null)可以被覆盖
      * @param evict if false, the table is in creation mode.
      * @return previous value, or null if none
      */
-    final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
-                   boolean evict) {
+    final V putVal(int hash, K key, V value, boolean onlyIfAbsent, 
+                   boolean evict) { //onlyIfAbsent==true?不能改变已存在的,evict==false?表处于创建模式
         Node<K,V>[] tab; Node<K,V> p; int n, i;
-        if ((tab = table) == null || (n = tab.length) == 0)
-            n = (tab = resize()).length;
-        if ((p = tab[i = (n - 1) & hash]) == null)
-            tab[i] = newNode(hash, key, value, null);
-        else {
+        if ((tab = table) == null || (n = tab.length) == 0) //若散列表为空
+            n = (tab = resize()).length; //n修改为散列表resize后的长度
+        if ((p = tab[i = (n - 1) & hash]) == null) //p=第(n-1) & hash个散列表节点，若p为空
+            tab[i] = newNode(hash, key, value, null); //插入新节点
+        else { //若p不为空，那就要从hash命中的第一个散列表节点开始遍历链表啦
             Node<K,V> e; K k;
-            if (p.hash == hash &&
-                ((k = p.key) == key || (key != null && key.equals(k))))
-                e = p;
-            else if (p instanceof TreeNode)
+            if (p.hash == hash && //检查第一个节点的hash一样不
+                ((k = p.key) == key || (key != null && key.equals(k)))) //key相等就找到啦（虽然已存在
+                e = p; 
+            else if (p instanceof TreeNode) //若p是TreeNode
                 e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
-            else {
-                for (int binCount = 0; ; ++binCount) {
-                    if ((e = p.next) == null) {
-                        p.next = newNode(hash, key, value, null);
-                        if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st
-                            treeifyBin(tab, hash);
-                        break;
+            else { //若p是普通链表节点
+                for (int binCount = 0; ; ++binCount) { //遍历链表啦
+                    if ((e = p.next) == null) { //找到尾部啦
+                        p.next = newNode(hash, key, value, null); //在尾部插入新节点
+                        if (binCount >= TREEIFY_THRESHOLD - 1) // -1 for 1st // 大于这个阈值转成红黑树 hama
+                            treeifyBin(tab, hash); //是觉得太长么 转成红黑树 hama
+                        break; //已经找到了，退了
                     }
                     if (e.hash == hash &&
-                        ((k = e.key) == key || (key != null && key.equals(k))))
+                        ((k = e.key) == key || (key != null && key.equals(k)))) //找到啦，在链表某个地方
                         break;
                     p = e;
                 }
             }
-            if (e != null) { // existing mapping for key
+            if (e != null) { // existing mapping for key //已存在
                 V oldValue = e.value;
-                if (!onlyIfAbsent || oldValue == null)
+                if (!onlyIfAbsent || oldValue == null) //覆盖不覆盖啊
                     e.value = value;
-                afterNodeAccess(e);
-                return oldValue;
+                afterNodeAccess(e); //这是啥 hama
+                return oldValue; //返回旧值
             }
         }
         ++modCount;
-        if (++size > threshold)
-            resize();
-        afterNodeInsertion(evict);
+        if (++size > threshold) //键值对总数量大于扩容阈值
+            resize(); //扩容
+        afterNodeInsertion(evict); //这是啥 hama
         return null;
     }
 
@@ -673,8 +673,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @return the table
      */
-    final Node<K,V>[] resize() {
-        Node<K,V>[] oldTab = table;
+    final Node<K,V>[] resize() { //扩容到2的次方个散列表元素
+        Node<K,V>[] oldTab = table; //新表变旧表，先存下旧表啦
         int oldCap = (oldTab == null) ? 0 : oldTab.length;
         int oldThr = threshold;
         int newCap, newThr = 0;
