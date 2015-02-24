@@ -324,7 +324,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * is performed, so there is a slight chance that multiple calls to this
      * method will not all return the same set.
      */ // hama 线程不安全
-    public Set<K> keySet() {
+    public Set<K> keySet() { //拿到所有key的set,只初始化第一次
         if (keySet == null) {
             keySet = new AbstractSet<K>() { //原先未实现Set接口的方法，嘛单纯抽象类也是可以new的
                 public Iterator<K> iterator() {
@@ -381,7 +381,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * performed, so there is a slight chance that multiple calls to this
      * method will not all return the same collection.
      */
-    public Collection<V> values() {
+    public Collection<V> values() { //拿到value们的set，只初始化第一次
         if (values == null) {
             values = new AbstractCollection<V>() {
                 public Iterator<V> iterator() {
@@ -422,7 +422,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
         return values;
     }
 
-    public abstract Set<Entry<K,V>> entrySet();
+    public abstract Set<Entry<K,V>> entrySet(); //返回键值对的集合
 
 
     // Comparison and hashing
@@ -449,7 +449,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * @param o object to be compared for equality with this map
      * @return <tt>true</tt> if the specified object is equal to this map
      */
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { //是不是this 是不是Map接口 size一样吗 每个键值对都一样吗
         if (o == this)
             return true;
 
@@ -500,7 +500,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * @see Object#equals(Object)
      * @see Set#equals(Object)
      */
-    public int hashCode() {
+    public int hashCode() { //键值对的hash的和
         int h = 0;
         Iterator<Entry<K,V>> i = entrySet().iterator();
         while (i.hasNext())
@@ -546,7 +546,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      *
      * @return a shallow copy of this map
      */
-    protected Object clone() throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException { //浅复制
         AbstractMap<?,?> result = (AbstractMap<?,?>)super.clone();
         result.keySet = null;
         result.values = null;
@@ -582,12 +582,12 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * @since 1.6
      */
     public static class SimpleEntry<K,V>
-        implements Entry<K,V>, java.io.Serializable
+        implements Entry<K,V>, java.io.Serializable //键值对的类，实现Map.Entry接口
     {
         private static final long serialVersionUID = -8499721149061103585L;
 
-        private final K key;
-        private V value;
+        private final K key; //键
+        private V value; //值
 
         /**
          * Creates an entry representing a mapping from the specified
@@ -596,7 +596,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          * @param key the key represented by this entry
          * @param value the value represented by this entry
          */
-        public SimpleEntry(K key, V value) {
+        public SimpleEntry(K key, V value) { //构造
             this.key   = key;
             this.value = value;
         }
@@ -607,7 +607,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          *
          * @param entry the entry to copy
          */
-        public SimpleEntry(Entry<? extends K, ? extends V> entry) {
+        public SimpleEntry(Entry<? extends K, ? extends V> entry) { //用Entry构造
             this.key   = entry.getKey();
             this.value = entry.getValue();
         }
@@ -617,7 +617,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          *
          * @return the key corresponding to this entry
          */
-        public K getKey() {
+        public K getKey() { //拿key
             return key;
         }
 
@@ -626,7 +626,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          *
          * @return the value corresponding to this entry
          */
-        public V getValue() {
+        public V getValue() { //拿value
             return value;
         }
 
@@ -637,7 +637,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          * @param value new value to be stored in this entry
          * @return the old value corresponding to the entry
          */
-        public V setValue(V value) {
+        public V setValue(V value) { //设置value
             V oldValue = this.value;
             this.value = value;
             return oldValue;
@@ -664,7 +664,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          *         entry
          * @see    #hashCode
          */
-        public boolean equals(Object o) {
+        public boolean equals(Object o) { //是否是Entry 键值对一样吗 妈蛋为嘛不先看this
             if (!(o instanceof Map.Entry))
                 return false;
             Map.Entry<?,?> e = (Map.Entry<?,?>)o;
@@ -684,7 +684,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
          * @return the hash code value for this map entry
          * @see    #equals
          */
-        public int hashCode() {
+        public int hashCode() { //键值hash异或
             return (key   == null ? 0 :   key.hashCode()) ^
                    (value == null ? 0 : value.hashCode());
         }
@@ -712,11 +712,11 @@ public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实�
      * @since 1.6
      */
     public static class SimpleImmutableEntry<K,V>
-        implements Entry<K,V>, java.io.Serializable
+        implements Entry<K,V>, java.io.Serializable //不可变的键值对
     {
         private static final long serialVersionUID = 7138329143949025153L;
 
-        private final K key;
+        private final K key; //俩final
         private final V value;
 
         /**

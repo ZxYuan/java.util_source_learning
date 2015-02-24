@@ -135,7 +135,7 @@ import java.util.function.Function;
  * @since   1.2
  */
 public class HashMap<K,V> extends AbstractMap<K,V>
-    implements Map<K,V>, Cloneable, Serializable {
+    implements Map<K,V>, Cloneable, Serializable { // HashMap，键值对映射大法
 
     private static final long serialVersionUID = 362498820763181265L;
 
@@ -232,19 +232,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /**
      * The default initial capacity - MUST be a power of two.
      */
-    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
+    static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16 // 默认初始容量
 
     /*
      * The maximum capacity, used if a higher value is implicitly specified
      * by either of the constructors with arguments.
      * MUST be a power of two <= 1<<30.
      */
-    static final int MAXIMUM_CAPACITY = 1 << 30;
+    static final int MAXIMUM_CAPACITY = 1 << 30; //最大容量
 
     /**
      * The load factor used when none specified in constructor.
      */
-    static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    static final float DEFAULT_LOAD_FACTOR = 0.75f; //默认载荷因子
 
     /**
      * The bin count threshold for using a tree rather than list for a
@@ -254,14 +254,14 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * tree removal about conversion back to plain bins upon
      * shrinkage.
      */
-    static final int TREEIFY_THRESHOLD = 8;
+    static final int TREEIFY_THRESHOLD = 8; // hama 用tree代替list作为bin时的bin数阈值
 
     /**
      * The bin count threshold for untreeifying a (split) bin during a
      * resize operation. Should be less than TREEIFY_THRESHOLD, and at
      * most 6 to mesh with shrinkage detection under removal.
      */
-    static final int UNTREEIFY_THRESHOLD = 6;
+    static final int UNTREEIFY_THRESHOLD = 6; // hama
 
     /**
      * The smallest table capacity for which bins may be treeified.
@@ -269,19 +269,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Should be at least 4 * TREEIFY_THRESHOLD to avoid conflicts
      * between resizing and treeification thresholds.
      */
-    static final int MIN_TREEIFY_CAPACITY = 64;
+    static final int MIN_TREEIFY_CAPACITY = 64; // hama
 
     /**
      * Basic hash bin node, used for most entries.  (See below for
      * TreeNode subclass, and in LinkedHashMap for its Entry subclass.)
      */
-    static class Node<K,V> implements Map.Entry<K,V> {
-        final int hash;
-        final K key;
-        V value;
-        Node<K,V> next;
+    static class Node<K,V> implements Map.Entry<K,V> { // 带next指向的键值对节点，也是实现了Map.Entry
+        final int hash; // hama 谁的hash?
+        final K key; //键，不可变
+        V value; //值
+        Node<K,V> next; //下一个节点
 
-        Node(int hash, K key, V value, Node<K,V> next) {
+        Node(int hash, K key, V value, Node<K,V> next) { //构造，这个hash究竟是怎么决定的
             this.hash = hash;
             this.key = key;
             this.value = value;
@@ -292,17 +292,17 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         public final V getValue()      { return value; }
         public final String toString() { return key + "=" + value; }
 
-        public final int hashCode() {
+        public final int hashCode() { //键值hash异或
             return Objects.hashCode(key) ^ Objects.hashCode(value);
         }
 
-        public final V setValue(V newValue) {
+        public final V setValue(V newValue) { //设置value
             V oldValue = value;
             value = newValue;
             return oldValue;
         }
 
-        public final boolean equals(Object o) {
+        public final boolean equals(Object o) { //this 类型 键值
             if (o == this)
                 return true;
             if (o instanceof Map.Entry) {
@@ -333,7 +333,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * to incorporate impact of the highest bits that would otherwise
      * never be used in index calculations because of table bounds.
      */
-    static final int hash(Object key) {
+    static final int hash(Object key) { // 这个hash又是干啥的
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
@@ -342,7 +342,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Returns x's Class if it is of the form "class C implements
      * Comparable<C>", else null.
      */
-    static Class<?> comparableClassFor(Object x) {
+    static Class<?> comparableClassFor(Object x) { // hama 疑似高科技
         if (x instanceof Comparable) {
             Class<?> c; Type[] ts, as; Type t; ParameterizedType p;
             if ((c = x.getClass()) == String.class) // bypass checks
@@ -365,7 +365,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Returns k.compareTo(x) if x matches kc (k's screened comparable
      * class), else 0.
      */
-    @SuppressWarnings({"rawtypes","unchecked"}) // for cast to Comparable
+    @SuppressWarnings({"rawtypes","unchecked"}) // for cast to Comparable // hama
     static int compareComparables(Class<?> kc, Object k, Object x) {
         return (x == null || x.getClass() != kc ? 0 :
                 ((Comparable)k).compareTo(x));
@@ -374,7 +374,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /**
      * Returns a power of two size for the given target capacity.
      */
-    static final int tableSizeFor(int cap) {
+    static final int tableSizeFor(int cap) { //扩容的阈值 hama 总之给cap算出了个2的次方的size
         int n = cap - 1;
         n |= n >>> 1;
         n |= n >>> 2;
@@ -392,18 +392,18 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * (We also tolerate length zero in some operations to allow
      * bootstrapping mechanics that are currently not needed.)
      */
-    transient Node<K,V>[] table;
+    transient Node<K,V>[] table; // 长度总是2的次方 存节点的吧
 
     /**
      * Holds cached entrySet(). Note that AbstractMap fields are used
      * for keySet() and values().
      */
-    transient Set<Map.Entry<K,V>> entrySet;
+    transient Set<Map.Entry<K,V>> entrySet; // 不知道存啥，和上面的table有什么区别?
 
     /**
      * The number of key-value mappings contained in this map.
      */
-    transient int size;
+    transient int size; //键值对数量
 
     /**
      * The number of times this HashMap has been structurally modified
@@ -412,7 +412,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * rehash).  This field is used to make iterators on Collection-views of
      * the HashMap fail-fast.  (See ConcurrentModificationException).
      */
-    transient int modCount;
+    transient int modCount; //并发fail-fast用
 
     /**
      * The next size value at which to resize (capacity * load factor).
@@ -423,14 +423,14 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     // Additionally, if the table array has not been allocated, this
     // field holds the initial array capacity, or zero signifying
     // DEFAULT_INITIAL_CAPACITY.)
-    int threshold;
+    int threshold; //size达到这个阈值(capacity * load factor)就要resize
 
     /**
      * The load factor for the hash table.
      *
      * @serial
      */
-    final float loadFactor;
+    final float loadFactor; //载荷因子 = 键值对数量/hash表长度
 
     /* ---------------- Public operations -------------- */
 
@@ -443,7 +443,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
      */
-    public HashMap(int initialCapacity, float loadFactor) {
+    public HashMap(int initialCapacity, float loadFactor) { //构造hashmap
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal initial capacity: " +
                                                initialCapacity);
@@ -452,8 +452,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         if (loadFactor <= 0 || Float.isNaN(loadFactor))
             throw new IllegalArgumentException("Illegal load factor: " +
                                                loadFactor);
-        this.loadFactor = loadFactor;
-        this.threshold = tableSizeFor(initialCapacity);
+        this.loadFactor = loadFactor; //设置载荷因子
+        this.threshold = tableSizeFor(initialCapacity); //设置扩容阈值
     }
 
     /**
@@ -463,7 +463,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param  initialCapacity the initial capacity.
      * @throws IllegalArgumentException if the initial capacity is negative.
      */
-    public HashMap(int initialCapacity) {
+    public HashMap(int initialCapacity) { //构造
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
 
@@ -471,7 +471,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Constructs an empty <tt>HashMap</tt> with the default initial capacity
      * (16) and the default load factor (0.75).
      */
-    public HashMap() {
+    public HashMap() { //构造
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
 
@@ -484,7 +484,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param   m the map whose mappings are to be placed in this map
      * @throws  NullPointerException if the specified map is null
      */
-    public HashMap(Map<? extends K, ? extends V> m) {
+    public HashMap(Map<? extends K, ? extends V> m) { //用m构造HashMap
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         putMapEntries(m, false);
     }
@@ -495,7 +495,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param m the map
      * @param evict false when initially constructing this map, else
      * true (relayed to method afterNodeInsertion).
-     */
+     */ // final意思是觉得功能很完善了，子类不能重写；编译层面,大概函数入口已经绑在某地址上了？
     final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict) {
         int s = m.size();
         if (s > 0) {
