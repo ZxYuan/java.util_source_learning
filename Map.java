@@ -126,7 +126,7 @@ import java.io.Serializable;
  * @see Set
  * @since 1.2
  */
-public interface Map<K,V> {
+public interface Map<K,V> { //Map接口，K=>V
     // Query Operations
 
     /**
@@ -136,7 +136,7 @@ public interface Map<K,V> {
      *
      * @return the number of key-value mappings in this map
      */
-    int size();
+    int size(); //键值对数量
 
     /**
      * Returns <tt>true</tt> if this map contains no key-value mappings.
@@ -322,7 +322,7 @@ public interface Map<K,V> {
      *
      * @return a set view of the keys contained in this map
      */
-    Set<K> keySet();
+    Set<K> keySet(); //拿到key的set
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -339,7 +339,7 @@ public interface Map<K,V> {
      *
      * @return a collection view of the values contained in this map
      */
-    Collection<V> values();
+    Collection<V> values(); //拿到value的Collection
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -357,7 +357,7 @@ public interface Map<K,V> {
      *
      * @return a set view of the mappings contained in this map
      */
-    Set<Map.Entry<K, V>> entrySet();
+    Set<Map.Entry<K, V>> entrySet(); //返回键值对的集合
 
     /**
      * A map entry (key-value pair).  The <tt>Map.entrySet</tt> method returns
@@ -372,7 +372,7 @@ public interface Map<K,V> {
      * @see Map#entrySet()
      * @since 1.2
      */
-    interface Entry<K,V> {
+    interface Entry<K,V> { //一个键值对
         /**
          * Returns the key corresponding to this entry.
          *
@@ -435,7 +435,7 @@ public interface Map<K,V> {
          * @return <tt>true</tt> if the specified object is equal to this map
          *         entry
          */
-        boolean equals(Object o);
+        boolean equals(Object o); // o也是entry且映射关系相同
 
         /**
          * Returns the hash code value for this map entry.  The hash code
@@ -453,7 +453,7 @@ public interface Map<K,V> {
          * @see Object#equals(Object)
          * @see #equals(Object)
          */
-        int hashCode();
+        int hashCode(); //key的hash异或value的hash
 
         /**
          * Returns a comparator that compares {@link Map.Entry} in natural order on key.
@@ -542,7 +542,7 @@ public interface Map<K,V> {
      * @param o object to be compared for equality with this map
      * @return <tt>true</tt> if the specified object is equal to this map
      */
-    boolean equals(Object o);
+    boolean equals(Object o); //map的相等
 
     /**
      * Returns the hash code value for this map.  The hash code of a map is
@@ -557,7 +557,7 @@ public interface Map<K,V> {
      * @see Object#equals(Object)
      * @see #equals(Object)
      */
-    int hashCode();
+    int hashCode(); //各个键值对的hash的和
 
     // Defaultable methods
 

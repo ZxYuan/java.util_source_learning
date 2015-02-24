@@ -65,7 +65,7 @@ import java.util.Map.Entry;
  * @since 1.2
  */
 
-public abstract class AbstractMap<K,V> implements Map<K,V> {
+public abstract class AbstractMap<K,V> implements Map<K,V> { //抽象Map，实现Map接口
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)
@@ -108,15 +108,15 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * @throws ClassCastException   {@inheritDoc}
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean containsValue(Object value) {
-        Iterator<Entry<K,V>> i = entrySet().iterator();
-        if (value==null) {
+    public boolean containsValue(Object value) { //是否包含value
+        Iterator<Entry<K,V>> i = entrySet().iterator(); //拿到键值对集合的迭代器
+        if (value==null) { //为空，找空
             while (i.hasNext()) {
                 Entry<K,V> e = i.next();
                 if (e.getValue()==null)
                     return true;
             }
-        } else {
+        } else { //不为空，找value一样的
             while (i.hasNext()) {
                 Entry<K,V> e = i.next();
                 if (value.equals(e.getValue()))
@@ -140,7 +140,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * @throws ClassCastException   {@inheritDoc}
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean containsKey(Object key) {
+    public boolean containsKey(Object key) { //是否包含key
         Iterator<Map.Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
@@ -231,7 +231,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
      */
-    public V remove(Object key) {
+    public V remove(Object key) { //删了key，返回对应的value
         Iterator<Entry<K,V>> i = entrySet().iterator();
         Entry<K,V> correctEntry = null;
         if (key==null) {
@@ -305,8 +305,8 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * appropriate view the first time this view is requested.  The views are
      * stateless, so there's no reason to create more than one of each.
      */
-    transient volatile Set<K>        keySet = null;
-    transient volatile Collection<V> values = null;
+    transient volatile Set<K>        keySet = null; // hama 这里volatile的原因？ 就是存所有key的吧
+    transient volatile Collection<V> values = null; // hama 这里volatile的原因？ 就是存所有value的吧
 
     /**
      * {@inheritDoc}
@@ -323,19 +323,19 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * and returned in response to all subsequent calls.  No synchronization
      * is performed, so there is a slight chance that multiple calls to this
      * method will not all return the same set.
-     */
+     */ // hama 线程不安全
     public Set<K> keySet() {
         if (keySet == null) {
-            keySet = new AbstractSet<K>() {
+            keySet = new AbstractSet<K>() { //原先未实现Set接口的方法，嘛单纯抽象类也是可以new的
                 public Iterator<K> iterator() {
                     return new Iterator<K>() {
-                        private Iterator<Entry<K,V>> i = entrySet().iterator();
+                        private Iterator<Entry<K,V>> i = entrySet().iterator(); //键值对集合的迭代器
 
                         public boolean hasNext() {
                             return i.hasNext();
                         }
 
-                        public K next() {
+                        public K next() { //拿到key
                             return i.next().getKey();
                         }
 

@@ -86,22 +86,22 @@ import java.io.InvalidObjectException;
  * @since   1.2
  */
 
-public class HashSet<E>
+public class HashSet<E> //HashMap的key作为元素，value忽略
     extends AbstractSet<E>
-    implements Set<E>, Cloneable, java.io.Serializable
+    implements Set<E>, Cloneable, java.io.Serializable //使用散列存储的set类
 {
     static final long serialVersionUID = -5024744406713321676L;
 
-    private transient HashMap<E,Object> map;
+    private transient HashMap<E,Object> map; //原来内部用了hashmap啊，注意transient，不会整个序列化
 
     // Dummy value to associate with an Object in the backing Map
-    private static final Object PRESENT = new Object();
+    private static final Object PRESENT = new Object(); //Map里的value,set里忽略
 
     /**
      * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has
      * default initial capacity (16) and load factor (0.75).
      */
-    public HashSet() {
+    public HashSet() { //用HashMap构造
         map = new HashMap<>();
     }
 
@@ -114,8 +114,8 @@ public class HashSet<E>
      * @param c the collection whose elements are to be placed into this set
      * @throws NullPointerException if the specified collection is null
      */
-    public HashSet(Collection<? extends E> c) {
-        map = new HashMap<>(Math.max((int) (c.size()/.75f) + 1, 16));
+    public HashSet(Collection<? extends E> c) { //把Collection扔进HashMap来进行构造
+        map = new HashMap<>(Math.max((int) (c.size()/.75f) + 1, 16)); // max(4/3的size, 16)
         addAll(c);
     }
 
@@ -128,7 +128,7 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero, or if the load factor is nonpositive
      */
-    public HashSet(int initialCapacity, float loadFactor) {
+    public HashSet(int initialCapacity, float loadFactor) { // 初始容量，载荷因子=元素个数/散列表长度
         map = new HashMap<>(initialCapacity, loadFactor);
     }
 
@@ -140,7 +140,7 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero
      */
-    public HashSet(int initialCapacity) {
+    public HashSet(int initialCapacity) { // 初始容量
         map = new HashMap<>(initialCapacity);
     }
 
@@ -157,7 +157,7 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero, or if the load factor is nonpositive
      */
-    HashSet(int initialCapacity, float loadFactor, boolean dummy) {
+    HashSet(int initialCapacity, float loadFactor, boolean dummy) { // dummy什么鬼
         map = new LinkedHashMap<>(initialCapacity, loadFactor);
     }
 
@@ -168,7 +168,7 @@ public class HashSet<E>
      * @return an Iterator over the elements in this set
      * @see ConcurrentModificationException
      */
-    public Iterator<E> iterator() {
+    public Iterator<E> iterator() { //map的key集合的迭代器
         return map.keySet().iterator();
     }
 
@@ -177,7 +177,7 @@ public class HashSet<E>
      *
      * @return the number of elements in this set (its cardinality)
      */
-    public int size() {
+    public int size() { //map的元素数量
         return map.size();
     }
 
@@ -186,7 +186,7 @@ public class HashSet<E>
      *
      * @return <tt>true</tt> if this set contains no elements
      */
-    public boolean isEmpty() {
+    public boolean isEmpty() { //是否为空
         return map.isEmpty();
     }
 
@@ -199,7 +199,7 @@ public class HashSet<E>
      * @param o element whose presence in this set is to be tested
      * @return <tt>true</tt> if this set contains the specified element
      */
-    public boolean contains(Object o) {
+    public boolean contains(Object o) { //包含o吗
         return map.containsKey(o);
     }
 
@@ -215,8 +215,8 @@ public class HashSet<E>
      * @return <tt>true</tt> if this set did not already contain the specified
      * element
      */
-    public boolean add(E e) {
-        return map.put(e, PRESENT)==null;
+    public boolean add(E e) { //map里加个为e的key，value为PRESENT(伪)
+        return map.put(e, PRESENT)==null; //put返回null说明之前没有对应的key
     }
 
     /**
@@ -231,15 +231,15 @@ public class HashSet<E>
      * @param o object to be removed from this set, if present
      * @return <tt>true</tt> if the set contained the specified element
      */
-    public boolean remove(Object o) {
-        return map.remove(o)==PRESENT;
+    public boolean remove(Object o) { //删了o这个key
+        return map.remove(o)==PRESENT; //原来是PRESENT则说明原来有o这个key
     }
 
     /**
      * Removes all of the elements from this set.
      * The set will be empty after this call returns.
      */
-    public void clear() {
+    public void clear() { //清空
         map.clear();
     }
 
@@ -250,7 +250,7 @@ public class HashSet<E>
      * @return a shallow copy of this set
      */
     @SuppressWarnings("unchecked")
-    public Object clone() {
+    public Object clone() { //浅复制，set的复制->map的复制->map中的元素引用的复制
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, Object>) map.clone();
@@ -270,8 +270,8 @@ public class HashSet<E>
      *             (int), followed by all of its elements (each an Object) in
      *             no particular order.
      */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream s) 
+        throws java.io.IOException { //序列化
         // Write out any hidden serialization magic
         s.defaultWriteObject();
 
@@ -292,7 +292,7 @@ public class HashSet<E>
      * deserialize it).
      */
     private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
+        throws java.io.IOException, ClassNotFoundException { //反序列化
         // Read in any hidden serialization magic
         s.defaultReadObject();
 
@@ -347,7 +347,7 @@ public class HashSet<E>
      * @return a {@code Spliterator} over the elements in this set
      * @since 1.8
      */
-    public Spliterator<E> spliterator() {
+    public Spliterator<E> spliterator() { //新科技
         return new HashMap.KeySpliterator<E,Object>(map, 0, -1, 0, 0);
     }
 }

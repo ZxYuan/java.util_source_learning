@@ -55,7 +55,7 @@ package java.util;
  * @since 1.2
  */
 
-public abstract class AbstractSet<E> extends AbstractCollection<E> implements Set<E> {
+public abstract class AbstractSet<E> extends AbstractCollection<E> implements Set<E> { //抽象set类
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)
@@ -82,7 +82,7 @@ public abstract class AbstractSet<E> extends AbstractCollection<E> implements Se
      * @param o object to be compared for equality with this set
      * @return <tt>true</tt> if the specified object is equal to this set
      */
-    public boolean equals(Object o) {
+    public boolean equals(Object o) { // 是不是this 类型一样不 containsAll?
         if (o == this)
             return true;
 
@@ -117,7 +117,7 @@ public abstract class AbstractSet<E> extends AbstractCollection<E> implements Se
      * @see Object#equals(Object)
      * @see Set#equals(Object)
      */
-    public int hashCode() {
+    public int hashCode() { // 元素hash和
         int h = 0;
         Iterator<E> i = iterator();
         while (i.hasNext()) {
@@ -166,16 +166,16 @@ public abstract class AbstractSet<E> extends AbstractCollection<E> implements Se
      * @see #contains(Object)
      */
     public boolean removeAll(Collection<?> c) {
-        Objects.requireNonNull(c);
+        Objects.requireNonNull(c); //检查非空
         boolean modified = false;
 
-        if (size() > c.size()) {
-            for (Iterator<?> i = c.iterator(); i.hasNext(); )
-                modified |= remove(i.next());
-        } else {
-            for (Iterator<?> i = iterator(); i.hasNext(); ) {
-                if (c.contains(i.next())) {
-                    i.remove();
+        if (size() > c.size()) { //元素比c多的话
+            for (Iterator<?> i = c.iterator(); i.hasNext(); ) //遍历c
+                modified |= remove(i.next()); //删光集合中c含有的每个元素
+        } else { //元素不比c中的多
+            for (Iterator<?> i = iterator(); i.hasNext(); ) { //遍历本集合
+                if (c.contains(i.next())) { //c中含有的话
+                    i.remove(); //删了
                     modified = true;
                 }
             }
