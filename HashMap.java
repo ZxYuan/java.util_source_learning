@@ -672,46 +672,46 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * with a power of two offset in the new table.
      *
      * @return the table
-     */
+     */ // hama put头插是因为要转红黑树反正消耗也不大吗，resize的链表节点的迁移是如何做的
     final Node<K,V>[] resize() { //扩容到2的次方个散列表元素
         Node<K,V>[] oldTab = table; //新表变旧表，先存下旧表啦
-        int oldCap = (oldTab == null) ? 0 : oldTab.length;
-        int oldThr = threshold;
+        int oldCap = (oldTab == null) ? 0 : oldTab.length; //旧容量
+        int oldThr = threshold; //旧扩容阈值
         int newCap, newThr = 0;
-        if (oldCap > 0) {
-            if (oldCap >= MAXIMUM_CAPACITY) {
-                threshold = Integer.MAX_VALUE;
-                return oldTab;
+        if (oldCap > 0) { //旧容量比0大
+            if (oldCap >= MAXIMUM_CAPACITY) { //比最大容量还大
+                threshold = Integer.MAX_VALUE; //阈值设定为整数最大值
+                return oldTab; //不改变旧表直接返回
             }
             else if ((newCap = oldCap << 1) < MAXIMUM_CAPACITY &&
-                     oldCap >= DEFAULT_INITIAL_CAPACITY)
-                newThr = oldThr << 1; // double threshold
+                     oldCap >= DEFAULT_INITIAL_CAPACITY) //扩容到2倍，在正常范围内吗
+                newThr = oldThr << 1; // double threshold //扩容阈值也增长到2倍
         }
-        else if (oldThr > 0) // initial capacity was placed in threshold
-            newCap = oldThr;
-        else {               // zero initial threshold signifies using defaults
-            newCap = DEFAULT_INITIAL_CAPACITY;
-            newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);
+        else if (oldThr > 0) // initial capacity was placed in threshold //旧容量为0且旧扩容阈值大于0
+            newCap = oldThr; // 新容量改为旧阈值 hama
+        else {               // zero initial threshold signifies using defaults //旧容量为0且旧阈值为0
+            newCap = DEFAULT_INITIAL_CAPACITY; //新容量=默认容量
+            newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY); //新阈值=默认载荷因子*默认容量
         }
-        if (newThr == 0) {
-            float ft = (float)newCap * loadFactor;
+        if (newThr == 0) { //新阈值==0吗
+            float ft = (float)newCap * loadFactor; //重新计算新阈值
             newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
                       (int)ft : Integer.MAX_VALUE);
         }
-        threshold = newThr;
+        threshold = newThr; //确定新阈值
         @SuppressWarnings({"rawtypes","unchecked"})
-            Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];
-        table = newTab;
-        if (oldTab != null) {
-            for (int j = 0; j < oldCap; ++j) {
+            Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap]; //根据新容量，创建新散列表
+        table = newTab; //确定新散列表
+        if (oldTab != null) { //旧表非空的话，就要转移旧表的元素了
+            for (int j = 0; j < oldCap; ++j) { //遍历旧表
                 Node<K,V> e;
-                if ((e = oldTab[j]) != null) {
+                if ((e = oldTab[j]) != null) { //表节点非空的话
                     oldTab[j] = null;
-                    if (e.next == null)
-                        newTab[e.hash & (newCap - 1)] = e;
-                    else if (e instanceof TreeNode)
-                        ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
-                    else { // preserve order
+                    if (e.next == null) //只有一个节点的话
+                        newTab[e.hash & (newCap - 1)] = e; //节点转移到新表,与运算后索引位置变啦
+                    else if (e instanceof TreeNode) //节点是TreeNode的话
+                        ((TreeNode<K,V>)e).split(this, newTab, j, oldCap); // hama
+                    else { // preserve order //节点有链表的话 保持顺序 hama
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
@@ -751,19 +751,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Replaces all linked nodes in bin at index for given hash unless
      * table is too small, in which case resizes instead.
      */
-    final void treeifyBin(Node<K,V>[] tab, int hash) {
+    final void treeifyBin(Node<K,V>[] tab, int hash) { // 链表节点换成红黑树节点 具体不明 hama
         int n, index; Node<K,V> e;
-        if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY)
+        if (tab == null || (n = tab.length) < MIN_TREEIFY_CAPACITY) //为空扩容
             resize();
-        else if ((e = tab[index = (n - 1) & hash]) != null) {
+        else if ((e = tab[index = (n - 1) & hash]) != null) { //拿到bin头
             TreeNode<K,V> hd = null, tl = null;
             do {
-                TreeNode<K,V> p = replacementTreeNode(e, null);
+                TreeNode<K,V> p = replacementTreeNode(e, null); //根据e返回一个TreeNode
                 if (tl == null)
                     hd = p;
                 else {
-                    p.prev = tl;
-                    tl.next = p;
+                    p.prev = tl; //t1<=p
+                    tl.next = p; //t1=>p
                 }
                 tl = p;
             } while ((e = e.next) != null);
@@ -780,7 +780,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param m mappings to be stored in this map
      * @throws NullPointerException if the specified map is null
      */
-    public void putAll(Map<? extends K, ? extends V> m) {
+    public void putAll(Map<? extends K, ? extends V> m) { //m里的都加进去
         putMapEntries(m, true);
     }
 
@@ -793,7 +793,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *         (A <tt>null</tt> return can also indicate that the map
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public V remove(Object key) {
+    public V remove(Object key) { //删key对应的键值对
         Node<K,V> e;
         return (e = removeNode(hash(key), key, null, false, true)) == null ?
             null : e.value;
@@ -810,10 +810,10 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @return the node, or null if none
      */
     final Node<K,V> removeNode(int hash, Object key, Object value,
-                               boolean matchValue, boolean movable) {
+                               boolean matchValue, boolean movable) { //删键值对
         Node<K,V>[] tab; Node<K,V> p; int n, index;
         if ((tab = table) != null && (n = tab.length) > 0 &&
-            (p = tab[index = (n - 1) & hash]) != null) {
+            (p = tab[index = (n - 1) & hash]) != null) { //hash目标p不为空
             Node<K,V> node = null, e; K k; V v;
             if (p.hash == hash &&
                 ((k = p.key) == key || (key != null && key.equals(k))))
