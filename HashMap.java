@@ -711,20 +711,20 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                         newTab[e.hash & (newCap - 1)] = e; //节点转移到新表,与运算后索引位置变啦
                     else if (e instanceof TreeNode) //节点是TreeNode的话
                         ((TreeNode<K,V>)e).split(this, newTab, j, oldCap); // hama
-                    else { // preserve order //节点有链表的话 保持顺序 hama
+                    else { // preserve order //节点有链表的话，根据cap高位分成lo和hi两部分
                         Node<K,V> loHead = null, loTail = null;
                         Node<K,V> hiHead = null, hiTail = null;
                         Node<K,V> next;
                         do {
                             next = e.next;
-                            if ((e.hash & oldCap) == 0) {
+                            if ((e.hash & oldCap) == 0) { //若cap高位对应的hash的那位为0，组成lo链表
                                 if (loTail == null)
                                     loHead = e;
                                 else
                                     loTail.next = e;
                                 loTail = e;
                             }
-                            else {
+                            else { //若cap高位对应的hash的那位为1，组成hi链表
                                 if (hiTail == null)
                                     hiHead = e;
                                 else
@@ -734,11 +734,11 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                         } while ((e = next) != null);
                         if (loTail != null) {
                             loTail.next = null;
-                            newTab[j] = loHead;
+                            newTab[j] = loHead; // lo链表头的新索引位置与原先不变
                         }
                         if (hiTail != null) {
                             hiTail.next = null;
-                            newTab[j + oldCap] = hiHead;
+                            newTab[j + oldCap] = hiHead; // hi链表头的新索引位置正好多个oldCap
                         }
                     }
                 }
@@ -816,16 +816,16 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             (p = tab[index = (n - 1) & hash]) != null) { //hash目标p不为空
             Node<K,V> node = null, e; K k; V v;
             if (p.hash == hash &&
-                ((k = p.key) == key || (key != null && key.equals(k))))
+                ((k = p.key) == key || (key != null && key.equals(k)))) //在链表头就找到了
                 node = p;
-            else if ((e = p.next) != null) {
+            else if ((e = p.next) != null) { //链表有多个键值对
                 if (p instanceof TreeNode)
-                    node = ((TreeNode<K,V>)p).getTreeNode(hash, key);
-                else {
+                    node = ((TreeNode<K,V>)p).getTreeNode(hash, key); //红黑树节点的情形
+                else { //遍历链表找目标键值对
                     do {
                         if (e.hash == hash &&
                             ((k = e.key) == key ||
-                             (key != null && key.equals(k)))) {
+                             (key != null && key.equals(k)))) { //找到了
                             node = e;
                             break;
                         }
@@ -834,27 +834,27 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                 }
             }
             if (node != null && (!matchValue || (v = node.value) == value ||
-                                 (value != null && value.equals(v)))) {
+                                 (value != null && value.equals(v)))) { //删不删的策略
                 if (node instanceof TreeNode)
-                    ((TreeNode<K,V>)node).removeTreeNode(this, tab, movable);
-                else if (node == p)
+                    ((TreeNode<K,V>)node).removeTreeNode(this, tab, movable); //删红黑树节点
+                else if (node == p) //在链表头找到的情形
                     tab[index] = node.next;
-                else
+                else //在链表中找到的情形
                     p.next = node.next;
                 ++modCount;
-                --size;
-                afterNodeRemoval(node);
-                return node;
+                --size; //size-1
+                afterNodeRemoval(node); //用来在LinkedHashMap中移除(访问/插入)顺序的节点
+                return node; //返回删除节点
             }
         }
-        return null;
+        return null; //没找到或因策略则返回null
     }
 
     /**
      * Removes all of the mappings from this map.
      * The map will be empty after this call returns.
      */
-    public void clear() {
+    public void clear() { //清空哈希表
         Node<K,V>[] tab;
         modCount++;
         if ((tab = table) != null && size > 0) {
@@ -872,7 +872,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @return <tt>true</tt> if this map maps one or more keys to the
      *         specified value
      */
-    public boolean containsValue(Object value) {
+    public boolean containsValue(Object value) { //包含value吗
         Node<K,V>[] tab; V v;
         if ((tab = table) != null && size > 0) {
             for (int i = 0; i < tab.length; ++i) {
@@ -901,12 +901,12 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @return a set view of the keys contained in this map
      */
-    public Set<K> keySet() {
+    public Set<K> keySet() { //返回key的集合
         Set<K> ks;
         return (ks = keySet) == null ? (keySet = new KeySet()) : ks;
     }
 
-    final class KeySet extends AbstractSet<K> {
+    final class KeySet extends AbstractSet<K> { //Key集合类
         public final int size()                 { return size; }
         public final void clear()               { HashMap.this.clear(); }
         public final Iterator<K> iterator()     { return new KeyIterator(); }
@@ -948,12 +948,12 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @return a view of the values contained in this map
      */
-    public Collection<V> values() {
+    public Collection<V> values() { //返回值集合
         Collection<V> vs;
         return (vs = values) == null ? (values = new Values()) : vs;
     }
 
-    final class Values extends AbstractCollection<V> {
+    final class Values extends AbstractCollection<V> { //值集合类
         public final int size()                 { return size; }
         public final void clear()               { HashMap.this.clear(); }
         public final Iterator<V> iterator()     { return new ValueIterator(); }
@@ -993,12 +993,12 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @return a set view of the mappings contained in this map
      */
-    public Set<Map.Entry<K,V>> entrySet() {
+    public Set<Map.Entry<K,V>> entrySet() { //返回键值对的集合
         Set<Map.Entry<K,V>> es;
         return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
     }
 
-    final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    final class EntrySet extends AbstractSet<Map.Entry<K,V>> { //键值对的集合类
         public final int size()                 { return size; }
         public final void clear()               { HashMap.this.clear(); }
         public final Iterator<Map.Entry<K,V>> iterator() {
@@ -1312,7 +1312,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Object clone() {
+    public Object clone() { //浅复制
         HashMap<K,V> result;
         try {
             result = (HashMap<K,V>)super.clone();
@@ -1320,7 +1320,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);
         }
-        result.reinitialize();
+        result.reinitialize(); //初始化把一些数据成员归0
         result.putMapEntries(this, false);
         return result;
     }
@@ -1345,13 +1345,13 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *             emitted in no particular order.
      */
     private void writeObject(java.io.ObjectOutputStream s)
-        throws IOException {
+        throws IOException { //序列化
         int buckets = capacity();
         // Write out the threshold, loadfactor, and any hidden stuff
         s.defaultWriteObject();
         s.writeInt(buckets);
         s.writeInt(size);
-        internalWriteEntries(s);
+        internalWriteEntries(s); //键值对一个一个序列化
     }
 
     /**
@@ -1359,7 +1359,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * deserialize it).
      */
     private void readObject(java.io.ObjectInputStream s)
-        throws IOException, ClassNotFoundException {
+        throws IOException, ClassNotFoundException { //反序列化
         // Read in the threshold (ignored), loadfactor, and any hidden stuff
         s.defaultReadObject();
         reinitialize();
@@ -1402,7 +1402,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /* ------------------------------------------------------------ */
     // iterators
 
-    abstract class HashIterator {
+    abstract class HashIterator { //迭代器抽象类
         Node<K,V> next;        // next entry to return
         Node<K,V> current;     // current entry
         int expectedModCount;  // for fast-fail
@@ -1422,7 +1422,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             return next != null;
         }
 
-        final Node<K,V> nextNode() {
+        final Node<K,V> nextNode() { //这里是不是迭代不到链表内的键值对？ hama
             Node<K,V>[] t;
             Node<K,V> e = next;
             if (modCount != expectedModCount)
@@ -1466,7 +1466,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /* ------------------------------------------------------------ */
     // spliterators
 
-    static class HashMapSpliterator<K,V> {
+    static class HashMapSpliterator<K,V> { //新科技 hama
         final HashMap<K,V> map;
         Node<K,V> current;          // current node
         int index;                  // current index, modified on advance/split
@@ -1727,32 +1727,32 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Nearly all other internal methods are also package-protected
      * but are declared final, so can be used by LinkedHashMap, view
      * classes, and HashSet.
-     */
+     */ // 为LinkedHashMap准备的函数们
 
     // Create a regular (non-tree) node
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
+    Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) { //普通非红黑树节点
         return new Node<>(hash, key, value, next);
     }
 
     // For conversion from TreeNodes to plain nodes
-    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) {
+    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) { //红黑树节点转成普通节点
         return new Node<>(p.hash, p.key, p.value, next);
     }
 
     // Create a tree bin node
-    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
+    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) { //红黑树节点
         return new TreeNode<>(hash, key, value, next);
     }
 
     // For treeifyBin
-    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) { //普通节点转成红黑树节点
         return new TreeNode<>(p.hash, p.key, p.value, next);
     }
 
     /**
      * Reset to initial default state.  Called by clone and readObject.
      */
-    void reinitialize() {
+    void reinitialize() { //clone与反序列化的初始化用
         table = null;
         entrySet = null;
         keySet = null;
@@ -1768,7 +1768,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     void afterNodeRemoval(Node<K,V> p) { }
 
     // Called only from writeObject, to ensure compatible ordering.
-    void internalWriteEntries(java.io.ObjectOutputStream s) throws IOException {
+    void internalWriteEntries(java.io.ObjectOutputStream s) throws IOException { //对每个节点序列化
         Node<K,V>[] tab;
         if (size > 0 && (tab = table) != null) {
             for (int i = 0; i < tab.length; ++i) {
@@ -1787,8 +1787,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Entry for Tree bins. Extends LinkedHashMap.Entry (which in turn
      * extends Node) so can be used as extension of either regular or
      * linked node.
-     */
-    static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
+     */ // hama 红黑树节点，暂时搁置
+    static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> { //红黑树节点
         TreeNode<K,V> parent;  // red-black tree links
         TreeNode<K,V> left;
         TreeNode<K,V> right;

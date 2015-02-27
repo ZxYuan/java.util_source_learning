@@ -79,7 +79,7 @@ import java.util.function.Consumer;
  * @since 1.2
  * @param <E> the type of elements held in this collection
  */
-
+// 真双端链表
 public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
@@ -152,42 +152,42 @@ public class LinkedList<E>
     /**
      * Inserts element e before non-null Node succ.
      */
-    void linkBefore(E e, Node<E> succ) {
+    void linkBefore(E e, Node<E> succ) { //在非空节点succ前插个e
         // assert succ != null;
-        final Node<E> pred = succ.prev;
-        final Node<E> newNode = new Node<>(pred, e, succ);
-        succ.prev = newNode;
-        if (pred == null)
-            first = newNode;
+        final Node<E> pred = succ.prev; //pred=succ的前序节点
+        final Node<E> newNode = new Node<>(pred, e, succ); //包含e的新节点
+        succ.prev = newNode; //succ前序节点设为新节点
+        if (pred == null) //若原先的前序节点为空
+            first = newNode; //链表头=新节点
         else
-            pred.next = newNode;
-        size++;
-        modCount++;
+            pred.next = newNode; //原先的前序节点的后继=新节点
+        size++; //加size
+        modCount++; //加修改数
     }
 
     /**
      * Unlinks non-null first node f.
      */
-    private E unlinkFirst(Node<E> f) {
+    private E unlinkFirst(Node<E> f) { //去掉头节点，返回头节点的值
         // assert f == first && f != null;
-        final E element = f.item;
-        final Node<E> next = f.next;
-        f.item = null;
-        f.next = null; // help GC
-        first = next;
-        if (next == null)
+        final E element = f.item; // 拿到节点的值
+        final Node<E> next = f.next; //拿到第二个节点
+        f.item = null; //头节点值释放
+        f.next = null; // help GC //真的有效吗
+        first = next; //重置头节点
+        if (next == null) //若头节点为空
             last = null;
         else
-            next.prev = null;
+            next.prev = null; //头节点的前序为空
         size--;
         modCount++;
-        return element;
+        return element; //返回原先的节点值
     }
 
     /**
      * Unlinks non-null last node l.
      */
-    private E unlinkLast(Node<E> l) {
+    private E unlinkLast(Node<E> l) { //删掉尾节点
         // assert l == last && l != null;
         final E element = l.item;
         final Node<E> prev = l.prev;
@@ -206,7 +206,7 @@ public class LinkedList<E>
     /**
      * Unlinks non-null node x.
      */
-    E unlink(Node<E> x) {
+    E unlink(Node<E> x) { //删掉某个非空节点x
         // assert x != null;
         final E element = x.item;
         final Node<E> next = x.next;
@@ -238,7 +238,7 @@ public class LinkedList<E>
      * @return the first element in this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E getFirst() {
+    public E getFirst() { //拿到第一个节点的值
         final Node<E> f = first;
         if (f == null)
             throw new NoSuchElementException();
@@ -251,7 +251,7 @@ public class LinkedList<E>
      * @return the last element in this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E getLast() {
+    public E getLast() { //拿到最后一个节点的值
         final Node<E> l = last;
         if (l == null)
             throw new NoSuchElementException();
@@ -264,7 +264,7 @@ public class LinkedList<E>
      * @return the first element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeFirst() {
+    public E removeFirst() { //删掉第一个
         final Node<E> f = first;
         if (f == null)
             throw new NoSuchElementException();
@@ -277,7 +277,7 @@ public class LinkedList<E>
      * @return the last element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeLast() {
+    public E removeLast() { //删掉最后一个
         final Node<E> l = last;
         if (l == null)
             throw new NoSuchElementException();
@@ -289,7 +289,7 @@ public class LinkedList<E>
      *
      * @param e the element to add
      */
-    public void addFirst(E e) {
+    public void addFirst(E e) { //加到头节点
         linkFirst(e);
     }
 
@@ -300,7 +300,7 @@ public class LinkedList<E>
      *
      * @param e the element to add
      */
-    public void addLast(E e) {
+    public void addLast(E e) { //加到尾节点
         linkLast(e);
     }
 
@@ -313,7 +313,7 @@ public class LinkedList<E>
      * @param o element whose presence in this list is to be tested
      * @return {@code true} if this list contains the specified element
      */
-    public boolean contains(Object o) {
+    public boolean contains(Object o) { //是否包含o
         return indexOf(o) != -1;
     }
 
@@ -334,7 +334,7 @@ public class LinkedList<E>
      * @param e element to be appended to this list
      * @return {@code true} (as specified by {@link Collection#add})
      */
-    public boolean add(E e) {
+    public boolean add(E e) { //加一个（到尾节点）
         linkLast(e);
         return true;
     }
@@ -352,7 +352,7 @@ public class LinkedList<E>
      * @param o element to be removed from this list, if present
      * @return {@code true} if this list contained the specified element
      */
-    public boolean remove(Object o) {
+    public boolean remove(Object o) { //删除o
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
@@ -402,7 +402,7 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean addAll(int index, Collection<? extends E> c) {
+    public boolean addAll(int index, Collection<? extends E> c) { //在指定index的节点前插c
         checkPositionIndex(index);
 
         Object[] a = c.toArray();
@@ -411,29 +411,29 @@ public class LinkedList<E>
             return false;
 
         Node<E> pred, succ;
-        if (index == size) {
+        if (index == size) { //插到末尾
             succ = null;
             pred = last;
         } else {
-            succ = node(index);
-            pred = succ.prev;
+            succ = node(index); //拿到待插节点的后继
+            pred = succ.prev; //拿到待插节点的前序
         }
 
-        for (Object o : a) {
+        for (Object o : a) { //遍历
             @SuppressWarnings("unchecked") E e = (E) o;
-            Node<E> newNode = new Node<>(pred, e, null);
-            if (pred == null)
+            Node<E> newNode = new Node<>(pred, e, null); //新节点
+            if (pred == null) //插在头上
                 first = newNode;
             else
-                pred.next = newNode;
+                pred.next = newNode; //插在前序后面
             pred = newNode;
         }
 
-        if (succ == null) {
-            last = pred;
+        if (succ == null) { //插在尾上
+            last = pred; //设新的尾节点
         } else {
-            pred.next = succ;
-            succ.prev = pred;
+            pred.next = succ; //最后一个待插节点的后继设为succ
+            succ.prev = pred; //succ的前序设为最后一个待插节点
         }
 
         size += numNew;
@@ -445,7 +445,7 @@ public class LinkedList<E>
      * Removes all of the elements from this list.
      * The list will be empty after this call returns.
      */
-    public void clear() {
+    public void clear() { // 清空节点
         // Clearing all of the links between nodes is "unnecessary", but:
         // - helps a generational GC if the discarded nodes inhabit
         //   more than one generation
@@ -472,7 +472,7 @@ public class LinkedList<E>
      * @return the element at the specified position in this list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public E get(int index) {
+    public E get(int index) { //懂
         checkElementIndex(index);
         return node(index).item;
     }
@@ -486,7 +486,7 @@ public class LinkedList<E>
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public E set(int index, E element) {
+    public E set(int index, E element) { //懂
         checkElementIndex(index);
         Node<E> x = node(index);
         E oldVal = x.item;
@@ -503,7 +503,7 @@ public class LinkedList<E>
      * @param element element to be inserted
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public void add(int index, E element) {
+    public void add(int index, E element) { //在index前插element
         checkPositionIndex(index);
 
         if (index == size)
@@ -563,15 +563,15 @@ public class LinkedList<E>
     /**
      * Returns the (non-null) Node at the specified element index.
      */
-    Node<E> node(int index) {
+    Node<E> node(int index) { //找指定index的节点
         // assert isElementIndex(index);
 
-        if (index < (size >> 1)) {
+        if (index < (size >> 1)) { //比二分之size小的话顺着找
             Node<E> x = first;
             for (int i = 0; i < index; i++)
                 x = x.next;
             return x;
-        } else {
+        } else { //比二分之size大的话逆着找
             Node<E> x = last;
             for (int i = size - 1; i > index; i--)
                 x = x.prev;
@@ -592,7 +592,7 @@ public class LinkedList<E>
      * @return the index of the first occurrence of the specified element in
      *         this list, or -1 if this list does not contain the element
      */
-    public int indexOf(Object o) {
+    public int indexOf(Object o) { //找o
         int index = 0;
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next) {
@@ -647,7 +647,7 @@ public class LinkedList<E>
      * @return the head of this list, or {@code null} if this list is empty
      * @since 1.5
      */
-    public E peek() {
+    public E peek() { //获得头节点
         final Node<E> f = first;
         return (f == null) ? null : f.item;
     }
@@ -1119,7 +1119,7 @@ public class LinkedList<E>
      *             elements (each an Object) in the proper order.
      */
     private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
+        throws java.io.IOException { //序列化
         // Write out any hidden serialization magic
         s.defaultWriteObject();
 
@@ -1128,7 +1128,7 @@ public class LinkedList<E>
 
         // Write out all elements in the proper order.
         for (Node<E> x = first; x != null; x = x.next)
-            s.writeObject(x.item);
+            s.writeObject(x.item); //一个一个序列化
     }
 
     /**

@@ -156,8 +156,8 @@ public class HashSet<E> //HashMap的key作为元素，value忽略
      *             constructor from other int, float constructor.)
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero, or if the load factor is nonpositive
-     */
-    HashSet(int initialCapacity, float loadFactor, boolean dummy) { // dummy什么鬼
+     */ //这个只用来初始化LinkedHashSet
+    HashSet(int initialCapacity, float loadFactor, boolean dummy) { // dummy鬼，就是为了区分构造函数
         map = new LinkedHashMap<>(initialCapacity, loadFactor);
     }
 
