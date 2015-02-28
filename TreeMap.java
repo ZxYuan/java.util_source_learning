@@ -110,7 +110,7 @@ import java.util.function.Consumer;
 
 public class TreeMap<K,V>
     extends AbstractMap<K,V>
-    implements NavigableMap<K,V>, Cloneable, java.io.Serializable
+    implements NavigableMap<K,V>, Cloneable, java.io.Serializable //红黑树
 {
     /**
      * The comparator used to maintain order in this tree map, or
@@ -118,14 +118,14 @@ public class TreeMap<K,V>
      *
      * @serial
      */
-    private final Comparator<? super K> comparator;
+    private final Comparator<? super K> comparator; //比较器
 
-    private transient Entry<K,V> root = null;
+    private transient Entry<K,V> root = null; //根节点
 
     /**
      * The number of entries in the tree
      */
-    private transient int size = 0;
+    private transient int size = 0; //键值对数量
 
     /**
      * The number of structural modifications to the tree.
@@ -144,7 +144,7 @@ public class TreeMap<K,V>
      * {@code put(Object key, Object value)} call will throw a
      * {@code ClassCastException}.
      */
-    public TreeMap() {
+    public TreeMap() { //构造
         comparator = null;
     }
 
@@ -162,7 +162,7 @@ public class TreeMap<K,V>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the keys will be used.
      */
-    public TreeMap(Comparator<? super K> comparator) {
+    public TreeMap(Comparator<? super K> comparator) { //用比较器构造
         this.comparator = comparator;
     }
 
@@ -180,7 +180,7 @@ public class TreeMap<K,V>
      *         or are not mutually comparable
      * @throws NullPointerException if the specified map is null
      */
-    public TreeMap(Map<? extends K, ? extends V> m) {
+    public TreeMap(Map<? extends K, ? extends V> m) { //用Map构造
         comparator = null;
         putAll(m);
     }
@@ -194,10 +194,10 @@ public class TreeMap<K,V>
      *         and whose comparator is to be used to sort this map
      * @throws NullPointerException if the specified map is null
      */
-    public TreeMap(SortedMap<K, ? extends V> m) {
+    public TreeMap(SortedMap<K, ? extends V> m) { //用SortedMap构造
         comparator = m.comparator();
         try {
-            buildFromSorted(m.size(), m.entrySet().iterator(), null, null);
+            buildFromSorted(m.size(), m.entrySet().iterator(), null, null); //从SortedMap构造
         } catch (java.io.IOException cannotHappen) {
         } catch (ClassNotFoundException cannotHappen) {
         }
@@ -212,7 +212,7 @@ public class TreeMap<K,V>
      * @return the number of key-value mappings in this map
      */
     public int size() {
-        return size;
+        return size; //返回键值对数量
     }
 
     /**
@@ -228,7 +228,7 @@ public class TreeMap<K,V>
      *         and this map uses natural ordering, or its comparator
      *         does not permit null keys
      */
-    public boolean containsKey(Object key) {
+    public boolean containsKey(Object key) { //包含key吗
         return getEntry(key) != null;
     }
 
@@ -245,9 +245,9 @@ public class TreeMap<K,V>
      *         {@code false} otherwise
      * @since 1.2
      */
-    public boolean containsValue(Object value) {
-        for (Entry<K,V> e = getFirstEntry(); e != null; e = successor(e))
-            if (valEquals(value, e.value))
+    public boolean containsValue(Object value) { //包含value吗
+        for (Entry<K,V> e = getFirstEntry(); e != null; e = successor(e)) //遍历键值对
+            if (valEquals(value, e.value)) //value相等
                 return true;
         return false;
     }
@@ -274,26 +274,26 @@ public class TreeMap<K,V>
      *         and this map uses natural ordering, or its comparator
      *         does not permit null keys
      */
-    public V get(Object key) {
+    public V get(Object key) { //根据key拿到value
         Entry<K,V> p = getEntry(key);
         return (p==null ? null : p.value);
     }
 
-    public Comparator<? super K> comparator() {
+    public Comparator<? super K> comparator() { //返回比较器
         return comparator;
     }
 
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public K firstKey() {
+    public K firstKey() { //第一个键值对的key
         return key(getFirstEntry());
     }
 
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public K lastKey() {
+    public K lastKey() { //最后一个键值对的key
         return key(getLastEntry());
     }
 
@@ -309,8 +309,8 @@ public class TreeMap<K,V>
      *         the specified map contains a null key and this map does not
      *         permit null keys
      */
-    public void putAll(Map<? extends K, ? extends V> map) {
-        int mapSize = map.size();
+    public void putAll(Map<? extends K, ? extends V> map) { //把map中的都加入
+        int mapSize = map.size(); //
         if (size==0 && mapSize!=0 && map instanceof SortedMap) {
             Comparator<?> c = ((SortedMap<?,?>)map).comparator();
             if (c == comparator || (c != null && c.equals(comparator))) {
